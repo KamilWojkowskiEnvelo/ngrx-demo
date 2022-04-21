@@ -1,1 +1,24 @@
-<p>auth works!</p>
+<form [formGroup]="form" (ngSubmit)="login()" class="grid place-items-center mt-12">
+  <fieldset class="mb-4">
+    <label></label>
+    <input
+      *ngLet="form.controls['username'] as ctrl"
+      formControlName="username"
+      [class.border-b-red-500]="ctrl.touched && ctrl.errors"
+      class="border-b-2 focus:outline-none focus:border-b-black"
+      placeholder="nazwa użytkownika" />
+  </fieldset>
+
+  <fieldset class="mb-4">
+    <label></label>
+    <input
+      *ngLet="form.controls['password'] as ctrl"
+      formControlName="password"
+      [class.border-b-red-500]="ctrl.touched && ctrl.errors"
+      class="border-b-2 focus:outline-none focus:border-b-black"
+      placeholder="hasło"
+      type="password" />
+  </fieldset>
+
+  <button class="bg-emerald-500 px-2 py-1 rounded text-white" type="submit">zaloguj się</button>
+</form>

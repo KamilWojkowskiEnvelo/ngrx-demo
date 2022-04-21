@@ -1,16 +1,33 @@
 import { NgModule } from '@angular/core';
+import { Routes } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { SettingsComponent } from '@features/settings.component';
+import { ShellComponent } from '@features/shell.component';
+import { TasksComponent } from '@features/tasks/tasks.component';
+import { AuthGuard } from '@shared/auth.guard';
+import { AuthComponent } from './auth/auth.component';
 
 @NgModule({
   imports: [
     RouterModule.forRoot([
       {
         path: 'auth',
-        loadChildren: async () => (await import('./auth/auth.module')).AuthModule,
+        component: AuthComponent,
       },
       {
         path: 'app',
-        loadChildren: async () => (await import('./shell/shell.module')).ShellModule,
+        canActivate: [AuthGuard],
+        component: ShellComponent,
+        children: [
+          {
+            path: 'settings',
+            component: SettingsComponent,
+          },
+          {
+            path: 'tasks',
+            component: TasksComponent,
+          },
+        ],
       },
       {
         path: '',
@@ -21,7 +38,7 @@ import { RouterModule } from '@angular/router';
         path: '**',
         redirectTo: 'auth',
       },
-    ]),
+    ] as Routes),
   ],
   exports: [RouterModule],
 })

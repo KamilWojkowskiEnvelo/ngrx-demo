@@ -1,5 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
+
 @import url('http://fonts.googleapis.com/css?family=Lato:400,700');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 * {
   font-family: Lato, sans-serif;
@@ -11,4 +16,9 @@ html,
 body {
   height: 100%;
   color: var(--color);
+}
+
+.dark body {
+  color: white;
+  background: theme('colors.slate.600');
 }
