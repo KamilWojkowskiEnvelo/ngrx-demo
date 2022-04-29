@@ -10,10 +10,28 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LetDirective } from '@shared/let.directive';
 import { SettingsComponent } from '@features/settings.component';
 import { TasksComponent } from '@features/tasks/tasks.component';
+import { AppState } from './store/app.state';
+import { counterReducer } from './store/counter/counter.reducer';
+import { authReducer } from './store/auth';
 
 @NgModule({
-  declarations: [AppComponent, LetDirective, AuthComponent, ShellComponent, SettingsComponent, TasksComponent],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, StoreModule.forRoot({}, {})],
+  declarations: [
+    AppComponent,
+    LetDirective,
+    AuthComponent,
+    ShellComponent,
+    SettingsComponent,
+    TasksComponent,
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    StoreModule.forRoot<AppState>({
+      counter: counterReducer,
+      auth: authReducer,
+    }),
+  ],
   providers: [],
   bootstrap: [AppComponent],
 })

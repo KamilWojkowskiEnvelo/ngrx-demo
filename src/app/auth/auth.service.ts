@@ -1,23 +1,30 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { User, UserService } from '@features/user/user.service';
-import { delay, iif, map, of, ReplaySubject, switchMap, throwError } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from 'app/store/app.state';
+import { AuthActions } from 'app/store/auth';
+import { delay, iif, map, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private auth = new ReplaySubject<boolean>(1);
-
-  constructor(private router: Router, private userService: UserService) {
+  constructor(
+    private router: Router,
+    private userService: UserService,
+    private store: Store<AppState>
+  ) {
     this.checkToken().subscribe(isAuth => {
       if (!isAuth) {
-        this.auth.next(false);
+        this.store.dispatch(AuthActions.setNotAuthenticated());
 
         return;
       }
 
-      const userFromStorage: User | null = JSON.parse(localStorage.getItem('user') as string);
+      const userFromStorage: User | null = JSON.parse(
+        localStorage.getItem('user') as string
+      );
 
       if (!userFromStorage) {
         this.logout();
@@ -28,18 +35,16 @@ export class AuthService {
     });
   }
 
-  public get auth$() {
-    return this.auth.asObservable();
-  }
-
   public logout() {
     of(null).subscribe({
       next: () => {
-        this.auth.next(false);
+        this.store.dispatch(AuthActions.setNotAuthenticated());
         localStorage.removeItem('token');
         this.router.navigate(['auth']);
       },
-      error: () => alert('Podczas wylogowania wystąpił błąd'),
+      error: () => {
+        alert('Podczas wylogowania wystąpił błąd');
+      },
     });
   }
 
@@ -70,8 +75,6 @@ export class AuthService {
 
           localStorage.setItem('token', Math.random().toString().substring(2));
           localStorage.setItem('user', JSON.stringify(user));
-
-          this.router.navigate(['app']);
         },
         error: () => {
           alert('Błędny login lub hasło');
@@ -80,11 +83,12 @@ export class AuthService {
   }
 
   public checkToken() {
-    return of(localStorage.getItem('token')).pipe(delay(1000), map(Boolean));
+    return of(localStorage.getItem('token')).pipe(map(Boolean));
   }
 
   private setStateAfterAuth(user: User) {
     this.userService.setUser(user);
-    this.auth.next(true);
+    this.store.dispatch(AuthActions.setAuthenticated());
+    this.router.navigate(['app']);
   }
 }
